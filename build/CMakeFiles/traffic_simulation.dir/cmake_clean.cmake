@@ -6,8 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/traffic_simulation.dir/src/TrafficObject.cpp.o"
   "CMakeFiles/traffic_simulation.dir/src/TrafficSimulator-Final.cpp.o"
   "CMakeFiles/traffic_simulation.dir/src/Vehicle.cpp.o"
-  "traffic_simulation.pdb"
   "traffic_simulation"
+  "traffic_simulation.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
