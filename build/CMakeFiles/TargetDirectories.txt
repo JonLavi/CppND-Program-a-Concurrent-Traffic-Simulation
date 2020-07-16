@@ -1,3 +1,0 @@
-/Volumes/Data/Users/jonathan/code/udacity_cpp/CppND-Program-a-Concurrent-Traffic-Simulation/build/CMakeFiles/rebuild_cache.dir
-/Volumes/Data/Users/jonathan/code/udacity_cpp/CppND-Program-a-Concurrent-Traffic-Simulation/build/CMakeFiles/edit_cache.dir
-/Volumes/Data/Users/jonathan/code/udacity_cpp/CppND-Program-a-Concurrent-Traffic-Simulation/build/CMakeFiles/traffic_simulation.dir
