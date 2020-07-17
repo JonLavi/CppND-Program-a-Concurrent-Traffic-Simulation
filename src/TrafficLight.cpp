@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <thread>
+#include <future>
 #include "TrafficLight.h"
 
 /* Implementation of class "MessageQueue" */
@@ -12,8 +13,8 @@ T MessageQueue<T>::receive()
     // to wait for and receive new messages and pull them from the queue using move semantics.
     // The received object should then be returned by the receive function.
     std::lock_guard<std::mutex> lock(_mutex);
-    _condition.wait();
-    return _queue.pop();
+    auto result = std::move(_deque.pop_front());
+    _condition.wait(lock, []{return result;});
 }
 
 template <typename T>
@@ -22,7 +23,7 @@ void MessageQueue<T>::send(T &&msg)
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex>
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
     std::lock_guard<std::mutex> lock(_mutex);
-    _queue.emplace_back(msg);
+    _deque.emplace_back(msg);
     _condition.notify_one();
 }
 
@@ -38,6 +39,13 @@ void TrafficLight::waitForGreen()
     // FP.5b : add the implementation of the method waitForGreen, in which an infinite while-loop
     // runs and repeatedly calls the receive function on the message queue.
     // Once it receives TrafficLightPhase::green, the method returns.
+    while (true)
+    {
+        if (_queue.receive() == TrafficLightPhase::green)
+        {
+            return;
+        }
+    }
 }
 
 void TrafficLight::simulate()
@@ -56,19 +64,27 @@ void TrafficLight::cycleThroughPhases()
     
     while (true)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        
+        // wait
+        std::this_thread::sleep_for(std::chrono::seconds(rand() % 6 + 4));
+
+        // toggle phase
         if (TrafficLight::getCurrentPhase() == TrafficLightPhase::green){
-            std::this_thread::sleep_for(std::chrono::seconds(rand() % 6 + 4));
             TrafficLight::setCurrentPhase(TrafficLightPhase::red);
         } 
         else {
-            std::this_thread::sleep_for(std::chrono::seconds(rand() % 6 + 4));
-            TrafficLight::setCurrentPhase(TrafficLightPhase::red);
+            TrafficLight::setCurrentPhase(TrafficLightPhase::green);
         }
     
         // send the update method
-        _queue.send(TrafficLight::getCurrentPhase()); 
+        auto message = std::async(std::launch::async, 
+                                  &MessageQueue<TrafficLightPhase>::send, 
+                                  &_queue, 
+                                  std::move(TrafficLight::getCurrentPhase()));
+        
+        message.wait();
+
+        // extra wait
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
