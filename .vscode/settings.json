@@ -3,5 +3,6 @@
         "thread": "cpp",
         "future": "cpp",
         "__mutex_base": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

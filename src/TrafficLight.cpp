@@ -12,9 +12,12 @@ T MessageQueue<T>::receive()
     // FP.5a : The method receive should use std::unique_lock<std::mutex> and _condition.wait()
     // to wait for and receive new messages and pull them from the queue using move semantics.
     // The received object should then be returned by the receive function.
-    std::lock_guard<std::mutex> lock(_mutex);
-    auto result = std::move(_deque.pop_front());
-    _condition.wait(lock, []{return result;});
+    std::unique_lock<std::mutex> lock(_mutex);
+    _condition.wait(lock, [this](){return !_deque.empty();});
+
+    auto msg = std::move(_deque.back());
+    _deque.pop_back();
+    return msg;
 }
 
 template <typename T>
