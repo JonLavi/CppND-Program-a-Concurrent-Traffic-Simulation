@@ -37,7 +37,7 @@ class TrafficLight : public TrafficObject
 public:
     // constructor / desctructor
     TrafficLight();
-    ~TrafficLight();
+    ~TrafficLight() = default;
 
     enum TrafficLightPhase { red, green };
 
