@@ -72,7 +72,7 @@ void TrafficLight::cycleThroughPhases()
     {
         // establish how much time passed
         auto now = std::chrono::system_clock::now();
-        auto elapsed = startTime - now;
+        auto elapsed = now - startTime;
 
         // check if the interval is reached
         if (elapsed > interval){
