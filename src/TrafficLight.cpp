@@ -64,29 +64,41 @@ void TrafficLight::cycleThroughPhases()
     // and toggles the current phase of the traffic light between red and green and sends an update method
     // to the message queue using move semantics. The cycle duration should be a random value between 4 and 6 seconds.
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles.
-    
+
+    auto startTime = std::chrono::system_clock::now();
+    auto interval = std::chrono::seconds(rand() % 6 + 4);
+
     while (true)
     {
-        // wait
-        std::this_thread::sleep_for(std::chrono::seconds(rand() % 6 + 4));
+        // establish how much time passed
+        auto now = std::chrono::system_clock::now();
+        auto elapsed = startTime - now;
 
-        // toggle phase
-        if (TrafficLight::getCurrentPhase() == TrafficLightPhase::green){
-            TrafficLight::setCurrentPhase(TrafficLightPhase::red);
-        } 
-        else {
-            TrafficLight::setCurrentPhase(TrafficLightPhase::green);
+        // check if the interval is reached
+        if (elapsed > interval){
+            // toggle phase
+            if (TrafficLight::getCurrentPhase() == TrafficLightPhase::green){
+                TrafficLight::setCurrentPhase(TrafficLightPhase::red);
+            }
+            else {
+                TrafficLight::setCurrentPhase(TrafficLightPhase::green);
+            }
+
+            // send the update method
+            auto message = std::async(std::launch::async,
+                                    &MessageQueue<TrafficLightPhase>::send,
+                                    &_queue,
+                                    std::move(TrafficLight::getCurrentPhase()));
+
+            message.wait();
+
+            // start measuring time past from this moment
+            startTime = std::chrono::system_clock::now();
+            // make a new random interval
+            interval = std::chrono::seconds(rand() % 6 + 4);
         }
-    
-        // send the update method
-        auto message = std::async(std::launch::async, 
-                                  &MessageQueue<TrafficLightPhase>::send, 
-                                  &_queue, 
-                                  std::move(TrafficLight::getCurrentPhase()));
-        
-        message.wait();
 
-        // extra wait
+        // extra wait between cycles
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
