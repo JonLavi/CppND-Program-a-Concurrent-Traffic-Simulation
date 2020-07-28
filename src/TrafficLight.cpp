@@ -85,12 +85,7 @@ void TrafficLight::cycleThroughPhases()
             }
 
             // send the update method
-            auto message = std::async(std::launch::async,
-                                    &MessageQueue<TrafficLightPhase>::send,
-                                    &_queue,
-                                    std::move(TrafficLight::getCurrentPhase()));
-
-            message.wait();
+            _queue.send(std::move(_currentPhase));
 
             // start measuring time past from this moment
             startTime = std::chrono::system_clock::now();
