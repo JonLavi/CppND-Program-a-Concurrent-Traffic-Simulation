@@ -66,7 +66,7 @@ void TrafficLight::cycleThroughPhases()
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles.
 
     auto startTime = std::chrono::system_clock::now();
-    auto interval = std::chrono::seconds(rand() % 6 + 4);
+    auto interval = std::chrono::milliseconds(rand() % 2000 + 4000);
 
     while (true)
     {
@@ -75,7 +75,7 @@ void TrafficLight::cycleThroughPhases()
         auto elapsed = now - startTime;
 
         // check if the interval is reached
-        if (elapsed > interval){
+        if (elapsed >= interval){
             // toggle phase
             if (TrafficLight::getCurrentPhase() == TrafficLightPhase::green){
                 TrafficLight::setCurrentPhase(TrafficLightPhase::red);
@@ -95,7 +95,7 @@ void TrafficLight::cycleThroughPhases()
             // start measuring time past from this moment
             startTime = std::chrono::system_clock::now();
             // make a new random interval
-            interval = std::chrono::seconds(rand() % 6 + 4);
+            interval = std::chrono::milliseconds(rand() % 2000 + 4000);
         }
 
         // extra wait between cycles
